@@ -11,6 +11,12 @@ maria-log:
 	docker logs mariadb
 .PHONY: log-maria
 
+login-maria:
+	mysql -h 127.0.0.1 -u root -p
+.PHONY: login-maria
+
+#docker exec -it mariadb mysql -u root -p  
+
 color_logo:
 	@bash logo/logo.sh
 .PHONY: color_logo
