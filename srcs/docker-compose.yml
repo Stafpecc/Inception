@@ -1,10 +1,32 @@
-version: '3.8'
 services:
   mariadb:
-    build: ./requirements/mariadb
+    build:
+      context: ./requirements/MariaDB
+      dockerfile: Dockerfile
     container_name: mariadb
-    env_file:
-      - .env
-    secrets:
-      - db_root_password
-      - db_password
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-mydb}
+      MYSQL_USER: ${MYSQL_USER:-myuser}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mypassword}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - inception_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-rootpassword}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mariadb_data:
+    driver: local
+
+networks:
+  inception_network:
+    driver: bridge
+#aller check bridge subnet 

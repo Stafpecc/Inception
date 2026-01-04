@@ -1,16 +1,18 @@
 
-# Bullseye debian 11 --> Penultimate stable
-# Bookworm debian 12 --> Stable
-# Trixie   debian 13 --> TestingFROM debian:bullseye
-
-FROM debian:bullseye
+FROM debian:bookworm
 
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y mariadb-server mariadb-client
 
-COPY tools/ /docker-entrypoint-initdb.d/
+COPY tools/init.sh /
+
+RUN chmod +x /init.sh
+
+VOLUME [ "/var/lib/mysql" ]
+#persistance des data
 
 EXPOSE 3306
 
-CMD ["mysqld_safe"]
+ENTRYPOINT [ "/init.sh" ] 
+#voir diff entre Entrypoint et CMD

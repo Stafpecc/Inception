@@ -3,9 +3,13 @@ GREEN           := \033[1;32m
 RED             := \033[1;31m
 RESET           := \033[0m
 
-DOCKER_COMPOSE=docker-compose -f srcs/requirements/docker-compose.yml
+DOCKER_COMPOSE=docker compose -f srcs/docker-compose.yml
 
 all: build up
+
+maria-log:
+	docker logs mariadb
+.PHONY: log-maria
 
 color_logo:
 	@bash logo/logo.sh
@@ -26,11 +30,9 @@ down:
 	$(DOCKER_COMPOSE) down
 .PHONY: down
 
-clean: down
+clean:
 	@echo "$(RED)Cleaning containers, volumes, and images...$(RESET)"
-	$(DOCKER_COMPOSE) rm -f
-	docker volume prune -f
-	docker system prune -f
+	$(DOCKER_COMPOSE) down -v --rmi all --remove-orphans
 .PHONY: clean
 
 re: clean all
