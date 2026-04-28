@@ -1,12 +1,14 @@
+FROM debian:bookworm
 
-# Bullseye debian 11 --> Penultimate stable
-# Bookworm debian 12 --> Stable
-# Trixie   debian 13 --> Testing
+RUN apt-get update && apt-get install -y \
+	nginx \
+	openssl \
+	&& rm -rf /var/lib/apt/lists/*
 
-FROM debian:bullseye
+COPY conf/nginx.conf /etc/nginx/nginx.conf
+COPY tools/init.sh /init.sh
+RUN chmod +x /init.sh
 
-RUN apt-get update && apt-get install -y nginx-y
+EXPOSE 443
 
-COPY . .
-
-CMD []
+ENTRYPOINT ["/init.sh"]

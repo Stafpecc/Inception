@@ -7,11 +7,9 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-mydb}
-      MYSQL_USER: ${MYSQL_USER:-myuser}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mypassword}
-    ports:
-      - "3306:3306"
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-wordpress}
+      MYSQL_USER: ${MYSQL_USER:-wp_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-wp_password}
     volumes:
       - mariadb_data:/var/lib/mysql
     networks:
@@ -22,11 +20,70 @@ services:
       timeout: 5s
       retries: 5
 
+  wordpress:
+    build:
+      context: ./requirements/WordPress
+      dockerfile: Dockerfile
+    container_name: wordpress
+    restart: unless-stopped
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    environment:
+      WORDPRESS_DB_HOST: mariadb
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE:-wordpress}
+      WORDPRESS_DB_USER: ${MYSQL_USER:-wp_user}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD:-wp_password}
+      WORDPRESS_URL: ${WORDPRESS_URL:-https://tarini.42.fr}
+      WORDPRESS_TITLE: ${WORDPRESS_TITLE:-Inception}
+      WORDPRESS_ADMIN_USER: ${WORDPRESS_ADMIN_USER:-superuser}
+      WORDPRESS_ADMIN_PASSWORD: ${WORDPRESS_ADMIN_PASSWORD:-supersecret}
+      WORDPRESS_ADMIN_EMAIL: ${WORDPRESS_ADMIN_EMAIL:-superuser@tarini.42.fr}
+      WORDPRESS_USER: ${WORDPRESS_USER:-editor}
+      WORDPRESS_USER_EMAIL: ${WORDPRESS_USER_EMAIL:-editor@tarini.42.fr}
+      WORDPRESS_USER_PASSWORD: ${WORDPRESS_USER_PASSWORD:-editorpass}
+    volumes:
+      - wordpress_data:/var/www/html
+    networks:
+      - inception_network
+
+  nginx:
+    build:
+      context: ./requirements/Nginx
+      dockerfile: Dockerfile
+    container_name: nginx
+    restart: unless-stopped
+    depends_on:
+      - wordpress
+    ports:
+      - "443:443"
+    volumes:
+      - wordpress_data:/var/www/html:ro
+    networks:
+      - inception_network
+
 volumes:
   mariadb_data:
     driver: local
 
+  wordpress_data:
+    driver: local
+
+# volumes:
+#   mariadb_data:
+#     driver: local
+#     driver_opts:
+#       type: none
+#       o: bind
+#       device: /home/${USER_LOGIN}/data/mariadb
+
+#   wordpress_data:
+#     driver: local
+#     driver_opts:
+#       type: none
+#       o: bind
+#       device: /home/${USER_LOGIN}/data/wordpress
+
 networks:
   inception_network:
     driver: bridge
-#aller check bridge subnet 

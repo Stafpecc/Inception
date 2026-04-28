@@ -50,7 +50,7 @@ if [ ! -f "$INIT_FLAG" ]; then
     fi
 
 	mysqladmin -u root -p"${MYSQL_ROOT_PASSWORD}" shutdown
-	touch "INIT_FLAG"
+	touch "$INIT_FLAG"
 	echo "finish\n"
 fi
 
