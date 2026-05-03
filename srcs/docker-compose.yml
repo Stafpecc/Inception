@@ -49,7 +49,7 @@ services:
 
   nginx:
     build:
-      context: ./requirements/Nginx
+      context: ./requirements/NGINX
       dockerfile: Dockerfile
     container_name: nginx
     restart: unless-stopped
