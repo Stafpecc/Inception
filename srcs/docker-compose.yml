@@ -21,31 +21,35 @@ services:
       retries: 5
 
   wordpress:
-    build:
-      context: ./requirements/WordPress
-      dockerfile: Dockerfile
-    container_name: wordpress
-    restart: unless-stopped
-    depends_on:
-      mariadb:
-        condition: service_healthy
-    environment:
-      WORDPRESS_DB_HOST: mariadb
-      WORDPRESS_DB_NAME: ${MYSQL_DATABASE:-wordpress}
-      WORDPRESS_DB_USER: ${MYSQL_USER:-wp_user}
-      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD:-wp_password}
-      WORDPRESS_URL: ${WORDPRESS_URL:-https://tarini.42.fr}
-      WORDPRESS_TITLE: ${WORDPRESS_TITLE:-Inception}
-      WORDPRESS_ADMIN_USER: ${WORDPRESS_ADMIN_USER:-superuser}
-      WORDPRESS_ADMIN_PASSWORD: ${WORDPRESS_ADMIN_PASSWORD:-supersecret}
-      WORDPRESS_ADMIN_EMAIL: ${WORDPRESS_ADMIN_EMAIL:-superuser@tarini.42.fr}
-      WORDPRESS_USER: ${WORDPRESS_USER:-editor}
-      WORDPRESS_USER_EMAIL: ${WORDPRESS_USER_EMAIL:-editor@tarini.42.fr}
-      WORDPRESS_USER_PASSWORD: ${WORDPRESS_USER_PASSWORD:-editorpass}
-    volumes:
-      - wordpress_data:/var/www/html
-    networks:
-      - inception_network
+      build:
+        context: ./requirements/WordPress
+        dockerfile: Dockerfile
+      container_name: wordpress
+      restart: unless-stopped
+      depends_on:
+        mariadb:
+          condition: service_healthy
+        redis:
+          condition: service_started
+      environment:
+        WORDPRESS_DB_HOST: mariadb
+        WORDPRESS_DB_NAME: ${MYSQL_DATABASE:-wordpress}
+        WORDPRESS_DB_USER: ${MYSQL_USER:-wp_user}
+        WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD:-wp_password}
+        WORDPRESS_URL: ${WORDPRESS_URL:-https://tarini.42.fr}
+        WORDPRESS_TITLE: ${WORDPRESS_TITLE:-Inception}
+        WORDPRESS_ADMIN_USER: ${WORDPRESS_ADMIN_USER:-superuser}
+        WORDPRESS_ADMIN_PASSWORD: ${WORDPRESS_ADMIN_PASSWORD:-supersecret}
+        WORDPRESS_ADMIN_EMAIL: ${WORDPRESS_ADMIN_EMAIL:-superuser@tarini.42.fr}
+        WORDPRESS_USER: ${WORDPRESS_USER:-editor}
+        WORDPRESS_USER_EMAIL: ${WORDPRESS_USER_EMAIL:-editor@tarini.42.fr}
+        WORDPRESS_USER_PASSWORD: ${WORDPRESS_USER_PASSWORD:-editorpass}
+        REDIS_HOST: redis
+        REDIS_PORT: 6379
+      volumes:
+        - wordpress_data:/var/www/html
+      networks:
+        - inception_network
 
   nginx:
     build:
@@ -62,6 +66,80 @@ services:
     networks:
       - inception_network
 
+  redis:
+    build:
+      context: ./requirements/bonus/Redis
+      dockerfile: Dockerfile
+    container_name: redis
+    restart: unless-stopped
+    networks:
+      - inception_network
+
+  adminer:
+    build:
+      context: ./requirements/bonus/Adminer
+      dockerfile: Dockerfile
+    container_name: adminer
+    restart: unless-stopped
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks:
+      - inception_network
+
+  static:
+    build:
+      context: ./requirements/bonus/Static
+      dockerfile: Dockerfile
+    container_name: static
+    restart: unless-stopped
+    networks:
+      - inception_network
+
+  ftp:
+      build:
+        context: ./requirements/bonus/FTP
+        dockerfile: Dockerfile
+      container_name: ftp
+      restart: unless-stopped
+      environment:
+        FTP_USER: ${FTP_USER:-ftpuser}
+        FTP_PASSWORD: ${FTP_PASSWORD:-ftppassword}
+      ports:
+        - "21:21"
+        - "21000-21010:21000-21010"
+      volumes:
+        - wordpress_data:/var/www/html
+      networks:
+        - inception_network
+
+  portainer:
+    build:
+      context: ./requirements/bonus/Portainer
+      dockerfile: Dockerfile
+    container_name: portainer
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - inception_network
+
+  status:
+    build:
+      context: ./requirements/bonus/Status
+      dockerfile: Dockerfile
+    container_name: status
+    restart: unless-stopped
+    environment:
+      DISCORD_WEBHOOK_URL: ${DISCORD_WEBHOOK_URL}
+    ports:
+      - "8080:8080"
+    networks:
+      - inception_network
+
 volumes:
   mariadb_data:
     driver: local
@@ -69,6 +147,8 @@ volumes:
   wordpress_data:
     driver: local
 
+  portainer_data:
+    driver: local
 # volumes:
 #   mariadb_data:
 #     driver: local

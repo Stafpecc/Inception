@@ -9,11 +9,13 @@ DOCKER_COMPOSE  := docker compose -f srcs/docker-compose.yml
 LOGIN           := tarini
 DATA_DIR        := /home/$(LOGIN)/data
 
+
 .PHONY: all
 all: build up
 
 .PHONY: re
 re: clean all
+
 
 .PHONY: build
 build: color_logo
@@ -112,6 +114,16 @@ health:
 	@echo "$(YELLOW)WordPress:$(RESET) $$(docker inspect --format='{{.State.Status}}' wordpress)"
 	@echo "$(YELLOW)Nginx:$(RESET) $$(docker inspect --format='{{.State.Status}}' nginx)"
 
+
+
+.PHONY: init-dirs
+init-dirs:
+	@echo "$(GREEN)Creating data directories on host...$(RESET)"
+	mkdir -p $(DATA_DIR)/mariadb
+	mkdir -p $(DATA_DIR)/wordpress
+
+
+
 .PHONY: color_logo
 color_logo:
 	@bash logo/logo.sh
@@ -140,7 +152,7 @@ help:
 	@echo "  make wp-log       - WordPress logs"
 	@echo "  make nginx-log    - Nginx logs"
 	@echo ""
-	@echo "$(CYAN)Shell:$(RESET)"
+	@echo "$(YELLOW)Shell:$(RESET)"
 	@echo "  make maria-sh     - shell into MariaDB"
 	@echo "  make wp-sh        - shell into WordPress"
 	@echo "  make nginx-sh     - shell into Nginx"
@@ -149,7 +161,7 @@ help:
 	@echo "  make maria-login  - MySQL root prompt"
 	@echo "  make maria-status - MySQL server status"
 	@echo ""
-	@echo "$(YELLOW)Status:$(RESET)"
+	@echo "$(RED)Status:$(RESET)"
 	@echo "  make ps           - compose container list"
 	@echo "  make status       - containers + volumes + networks"
 	@echo "  make health       - health check status per container"
