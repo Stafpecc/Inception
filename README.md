@@ -76,11 +76,27 @@ make fclean
 
 ## Access
 
-* Main website: `https://tarini.42.fr`
-* Adminer: `http://localhost:8081`
-* Static website: `http://localhost:8082`
-* Portainer: `http://localhost:9000`
-* Status page: `http://localhost:8080`
+> Add `127.0.0.1 tarini.42.fr` to your `/etc/hosts` to use the domain URLs.
+
+### Via domain (recommended)
+| Service    | URL                              |
+|------------|----------------------------------|
+| WordPress  | https://tarini.42.fr             |
+| Adminer    | https://tarini.42.fr/adminer     |
+| Static     | https://tarini.42.fr/static      |
+| Portainer  | http://localhost:9000            |
+| Status     | http://localhost:8080            |
+
+### Via localhost (VS Code port forwarding)
+| Service    | URL                              |
+|------------|----------------------------------|
+| WordPress  | https://localhost:443            |
+| Adminer    | https://localhost:443/adminer    |
+| Static     | https://localhost:443/static     |
+| Portainer  | http://localhost:9000            |
+| Status     | http://localhost:8080            |
+
+> **Note:** The SSL certificate is self-signed. Accept the browser security warning to proceed.
 
 ---
 
