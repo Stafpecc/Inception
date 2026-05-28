@@ -37,13 +37,13 @@ https://tarini.42.fr
 ### Adminer (Database UI)
 
 ```
-http://localhost:8081
+http://tarini.42.fr/adminer
 ```
 
 ### Static website
 
 ```
-http://localhost:8082
+http://tarini.42.fr/static
 ```
 
 ### Portainer (Docker UI)

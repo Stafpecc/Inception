@@ -87,14 +87,14 @@ make fclean
 | Portainer  | http://localhost:9000            |
 | Status     | http://localhost:8080            |
 
-### Via localhost (VS Code port forwarding)
+### Via localhost (replace "XXX" with th VS Code port forwarding)
 | Service    | URL                              |
 |------------|----------------------------------|
-| WordPress  | https://localhost:443            |
-| Adminer    | https://localhost:443/adminer    |
-| Static     | https://localhost:443/static     |
-| Portainer  | http://localhost:9000            |
-| Status     | http://localhost:8080            |
+| WordPress  | https://localhost:XXX            |
+| Adminer    | https://localhost:XXX/adminer    |
+| Static     | https://localhost:XXX/static     |
+| Portainer  | http://localhost:XXXX            |
+| Status     | http://localhost:XXXX            |
 
 > **Note:** The SSL certificate is self-signed. Accept the browser security warning to proceed.
 
