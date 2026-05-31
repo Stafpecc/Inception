@@ -13,11 +13,17 @@ DATA_DIR        := /home/$(LOGIN)/data
 
 
 .PHONY: all
-all: build up
+all: init-dirs build up
 
 .PHONY: re
 re: clean all
 
+.PHONY: init-dirs
+init-dirs:
+	@echo "$(GREEN)Creating data directories on host...$(RESET)"
+	mkdir -p $(DATA_DIR)/mariadb
+	mkdir -p $(DATA_DIR)/wordpress
+	mkdir -p $(DATA_DIR)/portainer
 
 .PHONY: build
 build: color_logo
